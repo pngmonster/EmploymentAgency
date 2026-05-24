@@ -1,0 +1,4 @@
+Django==5.0.6
+mysqlclient==2.2.4          # MariaDB/MySQL драйвер для Django ORM
+python-decouple==3.8        # читает .env файл
+Pillow==10.3.0              # для ImageField (аватары, логотипы)

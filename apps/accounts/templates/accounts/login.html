@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Вход — JobBureau{% endblock %}
+
+{% block body %}
+<div class="auth-layout">
+
+  <!-- Левая панель — брендинг -->
+  <aside class="auth-brand">
+    <a href="/" class="brand-logo">Job<span>Bureau</span></a>
+    <div class="brand-tagline">
+      <p class="brand-tagline__title">Найдите<br><em>своё место</em></p>
+      <p class="brand-tagline__sub">Тысячи вакансий.<br>Один аккаунт.</p>
+    </div>
+    <div class="brand-deco" aria-hidden="true">
+      <div class="deco-circle deco-circle--1"></div>
+      <div class="deco-circle deco-circle--2"></div>
+    </div>
+  </aside>
+
+  <!-- Правая панель — форма -->
+  <main class="auth-card">
+    <div class="auth-card__inner">
+
+      <header class="auth-header">
+        <h1 class="auth-header__title">Войти</h1>
+        <p class="auth-header__sub">Нет аккаунта? <a href="{% url 'accounts:register' %}">Зарегистрироваться</a></p>
+      </header>
+
+      <form method="post" class="auth-form" novalidate>
+        {% csrf_token %}
+
+        {% for field in form %}
+        <div class="field {% if field.errors %}field--error{% endif %}">
+          <label class="field__label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}
+            <span class="field__error">{{ field.errors|first }}</span>
+          {% endif %}
+        </div>
+        {% endfor %}
+
+        {% if form.non_field_errors %}
+        <div class="form-error">{{ form.non_field_errors|first }}</div>
+        {% endif %}
+
+        <button type="submit" class="btn-primary">Войти</button>
+      </form>
+
+    </div>
+  </main>
+
+</div>
+{% endblock %}

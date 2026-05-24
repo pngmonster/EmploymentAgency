@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Личный кабинет — JobBureau{% endblock %}
+
+{% block body %}
+<div class="dashboard-layout">
+  <nav class="dash-nav">
+    <a href="/" class="brand-logo">Job<span>Bureau</span></a>
+    <span class="dash-nav__role">{{ user.get_role_display }}</span>
+    <a href="{% url 'accounts:logout' %}" class="dash-nav__logout">Выйти</a>
+  </nav>
+
+  <main class="dash-main">
+    <h1 class="dash-welcome">Добро пожаловать</h1>
+    <p class="dash-email">{{ user.email }}</p>
+    <p class="dash-hint">Функциональность личного кабинета в разработке.</p>
+  </main>
+</div>
+{% endblock %}

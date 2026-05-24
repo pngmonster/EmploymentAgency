@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Регистрация — JobBureau{% endblock %}
+
+{% block body %}
+<div class="auth-layout">
+
+  <aside class="auth-brand">
+    <a href="/" class="brand-logo">Job<span>Bureau</span></a>
+    <div class="brand-tagline">
+      <p class="brand-tagline__title">Начните<br><em>новый путь</em></p>
+      <p class="brand-tagline__sub">Создайте аккаунт.<br>Найдите работу мечты.</p>
+    </div>
+    <div class="brand-deco" aria-hidden="true">
+      <div class="deco-circle deco-circle--1"></div>
+      <div class="deco-circle deco-circle--2"></div>
+    </div>
+  </aside>
+
+  <main class="auth-card">
+    <div class="auth-card__inner">
+
+      <header class="auth-header">
+        <h1 class="auth-header__title">Регистрация</h1>
+        <p class="auth-header__sub">Уже есть аккаунт? <a href="{% url 'accounts:login' %}">Войти</a></p>
+      </header>
+
+      <form method="post" class="auth-form" novalidate>
+        {% csrf_token %}
+
+        <!-- Поле роли — кастомный RadioSelect -->
+        <div class="field role-field">
+          <label class="field__label">Я регистрируюсь как</label>
+          <div class="role-toggle">
+            {% for radio in form.role %}
+            <label class="role-toggle__option">
+              {{ radio.tag }}
+              <span>{{ radio.choice_label }}</span>
+            </label>
+            {% endfor %}
+          </div>
+          {% if form.role.errors %}
+            <span class="field__error">{{ form.role.errors|first }}</span>
+          {% endif %}
+        </div>
+
+        <!-- Остальные поля (без role) -->
+        {% for field in form %}
+          {% if field.name != 'role' %}
+          <div class="field {% if field.errors %}field--error{% endif %}">
+            <label class="field__label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+              <span class="field__error">{{ field.errors|first }}</span>
+            {% endif %}
+          </div>
+          {% endif %}
+        {% endfor %}
+
+        {% if form.non_field_errors %}
+        <div class="form-error">{{ form.non_field_errors|first }}</div>
+        {% endif %}
+
+        <button type="submit" class="btn-primary">Создать аккаунт</button>
+      </form>
+
+    </div>
+  </main>
+
+</div>
+{% endblock %}
