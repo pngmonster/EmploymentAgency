@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Мой профиль — JobBureau{% endblock %}
+{% block body %}
+<div class="shell">
+  {% include "partials/nav.html" %}
+  <main class="page-main">
+    <div class="page-head">
+      <h1 class="page-title">Мой профиль</h1>
+      <a href="{% url 'accounts:dashboard' %}" class="btn-back">← Кабинет</a>
+    </div>
+    {% if messages %}{% for m in messages %}<div class="alert alert--{{ m.tags }}">{{ m }}</div>{% endfor %}{% endif %}
+    <div class="card">
+      <form method="post" enctype="multipart/form-data" class="form-grid">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="field {% if field.errors %}field--error{% endif %} {% if field.name == 'about' or field.name == 'address' %}field--full{% endif %}">
+          <label class="field__label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}<span class="field__error">{{ field.errors|first }}</span>{% endif %}
+        </div>
+        {% endfor %}
+        <div class="field--full form-actions">
+          <button type="submit" class="btn-primary">Сохранить профиль</button>
+        </div>
+      </form>
+    </div>
+  </main>
+</div>
+{% endblock %}

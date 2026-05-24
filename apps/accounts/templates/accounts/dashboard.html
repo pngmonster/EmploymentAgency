@@ -2,17 +2,45 @@
 {% block title %}Личный кабинет — JobBureau{% endblock %}
 
 {% block body %}
-<div class="dashboard-layout">
-  <nav class="dash-nav">
-    <a href="/" class="brand-logo">Job<span>Bureau</span></a>
-    <span class="dash-nav__role">{{ user.get_role_display }}</span>
-    <a href="{% url 'accounts:logout' %}" class="dash-nav__logout">Выйти</a>
-  </nav>
-
+<div class="shell">
+  {% include "partials/nav.html" %}
   <main class="dash-main">
-    <h1 class="dash-welcome">Добро пожаловать</h1>
-    <p class="dash-email">{{ user.email }}</p>
-    <p class="dash-hint">Функциональность личного кабинета в разработке.</p>
+    <h1 class="page-title">Личный кабинет</h1>
+    <p class="page-sub">{{ user.email }} · {{ user.get_role_display }}</p>
+
+    <div class="dash-cards">
+      {% if user.role == 'applicant' %}
+        <a href="{% url 'applicants:profile' %}" class="dash-card">
+          <span class="dash-card__icon">👤</span>
+          <span class="dash-card__label">Мой профиль</span>
+        </a>
+        <a href="{% url 'applicants:resume_list' %}" class="dash-card">
+          <span class="dash-card__icon">📄</span>
+          <span class="dash-card__label">Мои резюме</span>
+        </a>
+        <a href="{% url 'applicants:applications' %}" class="dash-card">
+          <span class="dash-card__icon">📬</span>
+          <span class="dash-card__label">Мои отклики</span>
+        </a>
+        <a href="{% url 'vacancies:list' %}" class="dash-card">
+          <span class="dash-card__icon">🔍</span>
+          <span class="dash-card__label">Найти работу</span>
+        </a>
+      {% else %}
+        <a href="{% url 'employers:profile' %}" class="dash-card">
+          <span class="dash-card__icon">🏢</span>
+          <span class="dash-card__label">Профиль компании</span>
+        </a>
+        <a href="{% url 'vacancies:my_list' %}" class="dash-card">
+          <span class="dash-card__icon">📋</span>
+          <span class="dash-card__label">Мои вакансии</span>
+        </a>
+        <a href="{% url 'vacancies:create' %}" class="dash-card">
+          <span class="dash-card__icon">➕</span>
+          <span class="dash-card__label">Новая вакансия</span>
+        </a>
+      {% endif %}
+    </div>
   </main>
 </div>
 {% endblock %}

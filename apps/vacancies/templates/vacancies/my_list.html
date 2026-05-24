@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Мои вакансии — JobBureau{% endblock %}
+{% block body %}
+<div class="shell">
+  {% include "partials/nav.html" %}
+  <main class="page-main">
+    <div class="page-head">
+      <h1 class="page-title">Мои вакансии</h1>
+      <a href="{% url 'vacancies:create' %}" class="btn-primary">+ Новая вакансия</a>
+    </div>
+    {% if messages %}{% for m in messages %}<div class="alert alert--{{ m.tags }}">{{ m }}</div>{% endfor %}{% endif %}
+    {% if vacancies %}
+      <div class="item-list">
+        {% for v in vacancies %}
+        <div class="item-card">
+          <div class="item-card__body">
+            <p class="item-card__title">{{ v.title }}</p>
+            <div class="item-card__meta">
+              {% if v.city %}<span>{{ v.city }}</span>{% endif %}
+              <span>{{ v.salary_display }}</span>
+              <span class="badge badge--{{ v.status }}">{{ v.get_status_display }}</span>
+              <span>{{ v.applications_count }} откликов</span>
+            </div>
+          </div>
+          <div class="item-card__actions">
+            <a href="{% url 'vacancies:applications' v.pk %}" class="btn-sm">Отклики</a>
+            <a href="{% url 'vacancies:edit' v.pk %}" class="btn-sm">Редактировать</a>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <p>У вас пока нет вакансий.</p>
+        <a href="{% url 'vacancies:create' %}" class="btn-primary">Разместить первую</a>
+      </div>
+    {% endif %}
+  </main>
+</div>
+{% endblock %}

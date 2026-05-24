@@ -383,3 +383,414 @@ body {
   font-size: .9rem;
   margin-top: .5rem;
 }
+
+/* ============================================================
+   INNER PAGES — shell, nav, cards, forms
+   ============================================================ */
+
+/* ── Shell ──────────────────────────────────────────────────── */
+.shell { min-height: 100dvh; display: flex; flex-direction: column; }
+
+/* ── Top Nav ────────────────────────────────────────────────── */
+.topnav {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding: .9rem 2rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.topnav__links {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-left: auto;
+}
+
+.topnav__links a {
+  color: var(--text-muted);
+  font-size: .88rem;
+  text-decoration: none;
+  transition: color var(--transition);
+}
+.topnav__links a:hover { color: var(--text); }
+.topnav__logout:hover  { color: var(--error) !important; }
+
+.btn-nav {
+  background: var(--accent);
+  color: #fff !important;
+  border-radius: var(--radius);
+  padding: .4rem .9rem;
+}
+.btn-nav:hover { background: var(--accent-hover); }
+
+/* ── Page Main ──────────────────────────────────────────────── */
+.page-main {
+  flex: 1;
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 2.5rem 2rem;
+  animation: fadeUp .35s ease both;
+}
+
+.page-main--narrow { max-width: 760px; }
+
+.page-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.page-title {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  letter-spacing: -0.03em;
+  color: var(--text);
+}
+
+.page-sub {
+  color: var(--text-muted);
+  font-size: .9rem;
+  margin-top: -.5rem;
+  margin-bottom: 2rem;
+}
+
+/* ── Dashboard Cards ────────────────────────────────────────── */
+.dash-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.dash-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem 1.25rem;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .75rem;
+  transition: border-color var(--transition), transform var(--transition);
+  text-align: center;
+}
+
+.dash-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.dash-card__icon { font-size: 2rem; }
+
+.dash-card__label {
+  font-size: .88rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+/* ── Card ───────────────────────────────────────────────────── */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+}
+
+/* ── Form Grid ──────────────────────────────────────────────── */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+.form-grid .field { display: flex; flex-direction: column; gap: .45rem; }
+.form-grid .field--full { grid-column: 1 / -1; }
+
+.form-simple { display: flex; flex-direction: column; gap: 1.25rem; }
+
+.form-actions { display: flex; gap: 1rem; }
+
+/* Form inputs (inner pages) */
+.form-grid input,
+.form-grid select,
+.form-grid textarea,
+.form-simple input,
+.form-simple select,
+.form-simple textarea {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: .9rem;
+  font-weight: 300;
+  padding: .7rem .9rem;
+  width: 100%;
+  outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+.form-grid input:focus,
+.form-grid select:focus,
+.form-grid textarea:focus,
+.form-simple input:focus,
+.form-simple select:focus,
+.form-simple textarea:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(108,99,255,.12);
+}
+.form-grid select option,
+.form-simple select option { background: var(--bg-card); }
+
+/* ── Buttons ────────────────────────────────────────────────── */
+.btn-back {
+  font-size: .85rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color var(--transition);
+}
+.btn-back:hover { color: var(--text); }
+
+.btn-sm {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  font-size: .8rem;
+  font-family: var(--font-body);
+  padding: .4rem .8rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: border-color var(--transition), color var(--transition);
+  white-space: nowrap;
+}
+.btn-sm:hover { border-color: var(--accent); color: var(--text); }
+.btn-sm--danger:hover { border-color: var(--error); color: var(--error); }
+
+/* ── Item List (резюме, вакансии работодателя, отклики) ─────── */
+.item-list { display: flex; flex-direction: column; gap: .75rem; }
+
+.item-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  transition: border-color var(--transition);
+}
+.item-card:hover { border-color: #3a3a42; }
+
+.item-card__body { flex: 1; min-width: 0; }
+.item-card__title { font-weight: 500; color: var(--text); margin-bottom: .35rem; }
+.item-card__company { font-size: .85rem; color: var(--text-muted); margin-bottom: .5rem; }
+.item-card__comment { font-size: .85rem; color: var(--text-muted); font-style: italic; margin-top: .5rem; }
+.item-card__date { font-size: .8rem; color: var(--text-muted); white-space: nowrap; }
+
+.item-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  align-items: center;
+  font-size: .82rem;
+  color: var(--text-muted);
+}
+
+.item-card__actions {
+  display: flex;
+  gap: .5rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+/* ── Badges ─────────────────────────────────────────────────── */
+.badge {
+  font-size: .72rem;
+  font-weight: 500;
+  letter-spacing: .04em;
+  padding: .2rem .6rem;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+.badge--active   { background: rgba(78,203,141,.12); color: var(--success); }
+.badge--hidden   { background: rgba(107,107,117,.12); color: var(--text-muted); }
+.badge--archived { background: rgba(107,107,117,.12); color: var(--text-muted); }
+.badge--paused   { background: rgba(255,165,0,.12); color: #ffa500; }
+.badge--closed   { background: rgba(255,107,107,.12); color: var(--error); }
+.badge--pending  { background: rgba(108,99,255,.12); color: var(--accent); }
+.badge--viewed   { background: rgba(255,165,0,.12); color: #ffa500; }
+.badge--accepted { background: rgba(78,203,141,.12); color: var(--success); }
+.badge--rejected { background: rgba(255,107,107,.12); color: var(--error); }
+
+/* ── Tags ───────────────────────────────────────────────────── */
+.tags { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1rem 0; }
+.tag {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  color: var(--text-muted);
+  font-size: .8rem;
+  padding: .25rem .75rem;
+}
+
+/* ── Vacancy List (публичный) ───────────────────────────────── */
+.vacancy-list { display: flex; flex-direction: column; gap: .75rem; }
+
+.vacancy-card {
+  display: block;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+  text-decoration: none;
+  transition: border-color var(--transition), transform var(--transition);
+}
+.vacancy-card:hover {
+  border-color: var(--accent);
+  transform: translateX(3px);
+}
+
+.vacancy-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: .75rem;
+}
+.vacancy-card__title   { font-weight: 500; color: var(--text); font-size: 1rem; }
+.vacancy-card__company { font-size: .85rem; color: var(--text-muted); margin-top: .2rem; }
+.vacancy-card__salary  { font-weight: 500; color: var(--accent); white-space: nowrap; font-size: .95rem; }
+
+.vacancy-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  font-size: .8rem;
+  color: var(--text-muted);
+}
+.vacancy-card__meta span::before { content: '·'; margin-right: .5rem; }
+.vacancy-card__meta span:first-child::before { content: none; }
+
+/* ── Vacancy Detail ─────────────────────────────────────────── */
+.vacancy-detail { margin-top: 1.5rem; }
+
+.vacancy-detail__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+.vacancy-detail__title   { font-family: var(--font-display); font-size: 2rem; letter-spacing: -0.02em; color: var(--text); }
+.vacancy-detail__company { font-size: 1rem; color: var(--text-muted); margin-top: .25rem; }
+.vacancy-detail__salary  { font-size: 1.3rem; font-weight: 500; color: var(--accent); white-space: nowrap; }
+
+.vacancy-detail__section { margin-top: 2rem; }
+.section-title {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  color: var(--text);
+  margin-bottom: .75rem;
+  padding-bottom: .5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.prose { color: var(--text-muted); line-height: 1.8; font-size: .95rem; }
+
+/* ── Filters ────────────────────────────────────────────────── */
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75rem;
+  align-items: center;
+  margin-bottom: 1.75rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.25rem;
+}
+
+.filter-input {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: .88rem;
+  padding: .55rem .85rem;
+  outline: none;
+  flex: 1;
+  min-width: 160px;
+  transition: border-color var(--transition);
+}
+.filter-input--sm { max-width: 160px; }
+.filter-input:focus { border-color: var(--border-focus); }
+
+.filter-select {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: .88rem;
+  padding: .55rem .85rem;
+  outline: none;
+  cursor: pointer;
+}
+.filter-select--sm { font-size: .8rem; padding: .35rem .65rem; }
+.filter-select option { background: var(--bg-card); }
+
+/* ── Status form (отклики работодателя) ─────────────────────── */
+.status-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  align-items: center;
+}
+
+/* ── Alerts ─────────────────────────────────────────────────── */
+.alert {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  font-size: .88rem;
+  padding: .75rem 1rem;
+  margin-bottom: 1rem;
+}
+.alert--success { border-left: 3px solid var(--success); color: var(--success); background: rgba(78,203,141,.06); }
+.alert--error   { border-left: 3px solid var(--error); color: var(--error); background: rgba(255,107,107,.06); }
+.alert--warning { border-left: 3px solid #ffa500; color: #ffa500; background: rgba(255,165,0,.06); }
+
+/* ── Empty State ────────────────────────────────────────────── */
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+.empty-state p { font-size: 1rem; }
+
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .page-main { padding: 1.5rem 1rem; }
+  .topnav    { padding: .75rem 1rem; gap: 1rem; }
+  .vacancy-card__head { flex-direction: column; }
+  .vacancy-detail__head { flex-direction: column; }
+}

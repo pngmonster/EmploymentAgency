@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Мои резюме — JobBureau{% endblock %}
+{% block body %}
+<div class="shell">
+  {% include "partials/nav.html" %}
+  <main class="page-main">
+    <div class="page-head">
+      <h1 class="page-title">Мои резюме</h1>
+      <a href="{% url 'applicants:resume_create' %}" class="btn-primary">+ Создать резюме</a>
+    </div>
+    {% if messages %}{% for m in messages %}<div class="alert alert--{{ m.tags }}">{{ m }}</div>{% endfor %}{% endif %}
+    {% if resumes %}
+      <div class="item-list">
+        {% for r in resumes %}
+        <div class="item-card">
+          <div class="item-card__body">
+            <p class="item-card__title">{{ r.title }}</p>
+            <div class="item-card__meta">
+              <span>Опыт: {{ r.experience_years }} лет</span>
+              {% if r.salary_expected %}<span>ЗП: {{ r.salary_expected|floatformat:0 }} ₽</span>{% endif %}
+              <span class="badge badge--{{ r.status }}">{{ r.get_status_display }}</span>
+            </div>
+          </div>
+          <div class="item-card__actions">
+            <a href="{% url 'applicants:resume_edit' r.pk %}" class="btn-sm">Редактировать</a>
+            <form method="post" action="{% url 'applicants:resume_delete' r.pk %}" style="display:inline">
+              {% csrf_token %}
+              <button type="submit" class="btn-sm btn-sm--danger" onclick="return confirm('Удалить резюме?')">Удалить</button>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <p>У вас пока нет резюме.</p>
+        <a href="{% url 'applicants:resume_create' %}" class="btn-primary">Создать первое резюме</a>
+      </div>
+    {% endif %}
+  </main>
+</div>
+{% endblock %}

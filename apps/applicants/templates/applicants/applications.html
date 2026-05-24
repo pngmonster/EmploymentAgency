@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Мои отклики — JobBureau{% endblock %}
+{% block body %}
+<div class="shell">
+  {% include "partials/nav.html" %}
+  <main class="page-main">
+    <div class="page-head">
+      <h1 class="page-title">Мои отклики</h1>
+    </div>
+    {% if apps %}
+      <div class="item-list">
+        {% for app in apps %}
+        <div class="item-card">
+          <div class="item-card__body">
+            <p class="item-card__title">{{ app.vacancy.title }}</p>
+            <p class="item-card__company">{{ app.vacancy.employer.company_name }}</p>
+            <div class="item-card__meta">
+              <span>{{ app.vacancy.city }}</span>
+              <span>{{ app.vacancy.salary_display }}</span>
+              <span class="badge badge--{{ app.status }}">{{ app.get_status_display }}</span>
+            </div>
+            {% if app.employer_comment %}
+            <p class="item-card__comment">{{ app.employer_comment }}</p>
+            {% endif %}
+          </div>
+          <div class="item-card__date">{{ app.created_at|date:"d.m.Y" }}</div>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <p>Вы ещё не откликались на вакансии.</p>
+        <a href="{% url 'vacancies:list' %}" class="btn-primary">Найти вакансии</a>
+      </div>
+    {% endif %}
+  </main>
+</div>
+{% endblock %}

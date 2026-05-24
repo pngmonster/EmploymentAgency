@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Вакансии — JobBureau{% endblock %}
+{% block body %}
+<div class="shell">
+  {% include "partials/nav.html" %}
+  <main class="page-main">
+    <div class="page-head">
+      <h1 class="page-title">Вакансии</h1>
+      {% if user.is_authenticated and user.role == 'employer' %}
+        <a href="{% url 'vacancies:create' %}" class="btn-primary">+ Разместить вакансию</a>
+      {% endif %}
+    </div>
+
+    <!-- Фильтры -->
+    <form method="get" class="filters">
+      <input type="text" name="q" value="{{ query }}" placeholder="Должность или ключевое слово" class="filter-input">
+      <input type="text" name="city" value="{{ city }}" placeholder="Город" class="filter-input filter-input--sm">
+      <select name="format" class="filter-select">
+        <option value="">Формат работы</option>
+        {% for val, label in work_format_choices %}
+        <option value="{{ val }}" {% if format == val %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="btn-primary">Найти</button>
+      {% if query or city or format %}
+        <a href="{% url 'vacancies:list' %}" class="btn-back">Сбросить</a>
+      {% endif %}
+    </form>
+
+    {% if vacancies %}
+      <div class="vacancy-list">
+        {% for v in vacancies %}
+        <a href="{% url 'vacancies:detail' v.pk %}" class="vacancy-card">
+          <div class="vacancy-card__head">
+            <div>
+              <p class="vacancy-card__title">{{ v.title }}</p>
+              <p class="vacancy-card__company">{{ v.employer.company_name }}</p>
+            </div>
+            <p class="vacancy-card__salary">{{ v.salary_display }}</p>
+          </div>
+          <div class="vacancy-card__meta">
+            {% if v.city %}<span>📍 {{ v.city }}</span>{% endif %}
+            <span>{{ v.get_work_format_display }}</span>
+            <span>{{ v.get_employment_type_display }}</span>
+            {% if v.experience_years == 0 %}<span>Без опыта</span>{% else %}<span>Опыт от {{ v.experience_years }} лет</span>{% endif %}
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <p>Вакансий не найдено. Попробуйте изменить фильтры.</p>
+      </div>
+    {% endif %}
+  </main>
+</div>
+{% endblock %}

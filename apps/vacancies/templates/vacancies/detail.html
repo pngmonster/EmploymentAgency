@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}{{ vacancy.title }} — JobBureau{% endblock %}
+{% block body %}
+<div class="shell">
+  {% include "partials/nav.html" %}
+  <main class="page-main page-main--narrow">
+    <a href="{% url 'vacancies:list' %}" class="btn-back">← Все вакансии</a>
+    {% if messages %}{% for m in messages %}<div class="alert alert--{{ m.tags }}">{{ m }}</div>{% endfor %}{% endif %}
+
+    <div class="vacancy-detail">
+      <div class="vacancy-detail__head">
+        <div>
+          <h1 class="vacancy-detail__title">{{ vacancy.title }}</h1>
+          <p class="vacancy-detail__company">{{ vacancy.employer.company_name }}</p>
+        </div>
+        <p class="vacancy-detail__salary">{{ vacancy.salary_display }}</p>
+      </div>
+
+      <div class="tags">
+        {% if vacancy.city %}<span class="tag">📍 {{ vacancy.city }}</span>{% endif %}
+        <span class="tag">{{ vacancy.get_work_format_display }}</span>
+        <span class="tag">{{ vacancy.get_employment_type_display }}</span>
+        <span class="tag">{{ vacancy.get_schedule_display }}</span>
+        {% if vacancy.experience_years == 0 %}
+          <span class="tag">Без опыта</span>
+        {% else %}
+          <span class="tag">Опыт от {{ vacancy.experience_years }} лет</span>
+        {% endif %}
+      </div>
+
+      {% if vacancy.about %}
+      <div class="vacancy-detail__section">
+        <h2 class="section-title">О вакансии</h2>
+        <div class="prose">{{ vacancy.about|linebreaks }}</div>
+      </div>
+      {% endif %}
+
+      {% if vacancy.contact_name or vacancy.contact_phone or vacancy.contact_email %}
+      <div class="vacancy-detail__section">
+        <h2 class="section-title">Контакты</h2>
+        {% if vacancy.contact_name %}<p>{{ vacancy.contact_name }}</p>{% endif %}
+        {% if vacancy.contact_phone %}<p>{{ vacancy.contact_phone }}</p>{% endif %}
+        {% if vacancy.contact_email %}<p>{{ vacancy.contact_email }}</p>{% endif %}
+      </div>
+      {% endif %}
+
+      <!-- Форма отклика -->
+      {% if user.is_authenticated and user.role == 'applicant' %}
+        <div class="vacancy-detail__section">
+          {% if already_applied %}
+            <div class="alert alert--success">Вы уже откликались на эту вакансию.</div>
+          {% elif form %}
+            <h2 class="section-title">Откликнуться</h2>
+            <form method="post" class="form-simple">
+              {% csrf_token %}
+              {% for field in form %}
+              <div class="field {% if field.errors %}field--error{% endif %}">
+                <label class="field__label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}<span class="field__error">{{ field.errors|first }}</span>{% endif %}
+              </div>
+              {% endfor %}
+              <button type="submit" class="btn-primary">Отправить отклик</button>
+            </form>
+          {% else %}
+            <div class="alert">Добавьте резюме чтобы откликнуться.</div>
+          {% endif %}
+        </div>
+      {% elif not user.is_authenticated %}
+        <div class="vacancy-detail__section">
+          <a href="{% url 'accounts:login' %}" class="btn-primary">Войдите чтобы откликнуться</a>
+        </div>
+      {% endif %}
+    </div>
+  </main>
+</div>
+{% endblock %}

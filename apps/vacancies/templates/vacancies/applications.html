@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Отклики — JobBureau{% endblock %}
+{% block body %}
+<div class="shell">
+  {% include "partials/nav.html" %}
+  <main class="page-main">
+    <div class="page-head">
+      <h1 class="page-title">Отклики: {{ vacancy.title }}</h1>
+      <a href="{% url 'vacancies:my_list' %}" class="btn-back">← Мои вакансии</a>
+    </div>
+    {% if messages %}{% for m in messages %}<div class="alert alert--{{ m.tags }}">{{ m }}</div>{% endfor %}{% endif %}
+    {% if applications %}
+      <div class="item-list">
+        {% for app in applications %}
+        <div class="item-card">
+          <div class="item-card__body">
+            <p class="item-card__title">{{ app.resume.applicant.get_full_name }}</p>
+            <p class="item-card__company">{{ app.resume.title }} · Опыт: {{ app.resume.experience_years }} лет</p>
+            {% if app.cover_letter %}
+            <p class="item-card__comment">{{ app.cover_letter|truncatewords:30 }}</p>
+            {% endif %}
+            <div class="item-card__meta">
+              <span class="badge badge--{{ app.status }}">{{ app.get_status_display }}</span>
+              <span>{{ app.created_at|date:"d.m.Y" }}</span>
+            </div>
+          </div>
+          <div class="item-card__actions">
+            <form method="post" action="{% url 'vacancies:application_status' app.pk %}" class="status-form">
+              {% csrf_token %}
+              <select name="status" class="filter-select filter-select--sm">
+                {% for val, label in app.STATUS_CHOICES %}
+                <option value="{{ val }}" {% if app.status == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+              <input type="text" name="employer_comment" placeholder="Комментарий (необязательно)" class="filter-input filter-input--sm" value="{{ app.employer_comment }}">
+              <button type="submit" class="btn-sm">Сохранить</button>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state"><p>Откликов пока нет.</p></div>
+    {% endif %}
+  </main>
+</div>
+{% endblock %}
