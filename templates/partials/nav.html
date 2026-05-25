@@ -1,10 +1,10 @@
 <nav class="topnav">
   <a href="{% url 'vacancies:list' %}" class="brand-logo">Job<span>Bureau</span></a>
   <div class="topnav__links">
-    <a href="{% url 'vacancies:list' %}"><i class="ph ph-briefcase"></i> <span>Вакансии</span></a>
+    <a href="{% url 'vacancies:list' %}"><i class="ph ph-briefcase"></i> Вакансии</a>
     {% if user.is_authenticated %}
-      <a href="{% url 'accounts:dashboard' %}"><i class="ph ph-squares-four"></i> <span>Кабинет</span></a>
-      <a href="{% url 'accounts:logout' %}" class="topnav__logout"><i class="ph ph-sign-out"></i> <span>Выйти</span></a>
+      <a href="{% url 'accounts:dashboard' %}"><i class="ph ph-squares-four"></i> Кабинет</a>
+      <a href="{% url 'accounts:logout' %}" class="topnav__logout"><i class="ph ph-sign-out"></i> Выйти</a>
     {% else %}
       <a href="{% url 'accounts:login' %}">Войти</a>
       <a href="{% url 'accounts:register' %}" class="btn-nav">Регистрация</a>

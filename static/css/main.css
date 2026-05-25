@@ -434,10 +434,6 @@ body {
   margin-left: auto;
 }
 
-.topnav__links a span {
-    display: inline;
-}
-
 .topnav__links a {
   color: var(--text-muted);
   font-size: .88rem;
@@ -889,12 +885,6 @@ body {
 
   /* File upload */
   .file-upload { padding: .65rem .75rem; }
-}
-
-@media (max-width: 450px) {
-    .topnav__links a span {
-        display: none;
-    }
 }
 
 /* Очень маленькие экраны */

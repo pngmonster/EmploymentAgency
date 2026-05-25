@@ -45,3 +45,8 @@ htmlcov/
 
 # ── Migrations (оставляем в git, только __pycache__ внутри) ──
 apps/**/migrations/__pycache__/
+
+# Docker
+.env
+media/
+staticfiles/
