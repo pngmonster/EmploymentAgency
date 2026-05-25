@@ -11,7 +11,6 @@
       {% endif %}
     </div>
 
-    <!-- Фильтры -->
     <form method="get" class="filters">
       <input type="text" name="q" value="{{ query }}" placeholder="Должность или ключевое слово" class="filter-input">
       <input type="text" name="city" value="{{ city }}" placeholder="Город" class="filter-input filter-input--sm">
@@ -32,9 +31,16 @@
         {% for v in vacancies %}
         <a href="{% url 'vacancies:detail' v.pk %}" class="vacancy-card">
           <div class="vacancy-card__head">
-            <div>
-              <p class="vacancy-card__title">{{ v.title }}</p>
-              <p class="vacancy-card__company">{{ v.employer.company_name }}</p>
+            <div class="vacancy-card__left">
+              {% if v.employer.logo %}
+                <img src="{{ v.employer.logo.url }}" alt="{{ v.employer.company_name }}" class="vacancy-card__logo">
+              {% else %}
+                <div class="vacancy-card__logo-placeholder">{{ v.employer.company_name|first|upper }}</div>
+              {% endif %}
+              <div>
+                <p class="vacancy-card__title">{{ v.title }}</p>
+                <p class="vacancy-card__company">{{ v.employer.company_name }}</p>
+              </div>
             </div>
             <p class="vacancy-card__salary">{{ v.salary_display }}</p>
           </div>

@@ -9,9 +9,16 @@
 
     <div class="vacancy-detail">
       <div class="vacancy-detail__head">
-        <div>
-          <h1 class="vacancy-detail__title">{{ vacancy.title }}</h1>
-          <p class="vacancy-detail__company">{{ vacancy.employer.company_name }}</p>
+        <div class="vacancy-card__left">
+          {% if vacancy.employer.logo %}
+            <img src="{{ vacancy.employer.logo.url }}" alt="{{ vacancy.employer.company_name }}" class="vacancy-detail__logo">
+          {% else %}
+            <div class="vacancy-detail__logo-placeholder">{{ vacancy.employer.company_name|first|upper }}</div>
+          {% endif %}
+          <div>
+            <h1 class="vacancy-detail__title">{{ vacancy.title }}</h1>
+            <p class="vacancy-detail__company">{{ vacancy.employer.company_name }}</p>
+          </div>
         </div>
         <p class="vacancy-detail__salary">{{ vacancy.salary_display }}</p>
       </div>
@@ -38,13 +45,12 @@
       {% if vacancy.contact_name or vacancy.contact_phone or vacancy.contact_email %}
       <div class="vacancy-detail__section">
         <h2 class="section-title">Контакты</h2>
-        {% if vacancy.contact_name %}<p>{{ vacancy.contact_name }}</p>{% endif %}
-        {% if vacancy.contact_phone %}<p>{{ vacancy.contact_phone }}</p>{% endif %}
-        {% if vacancy.contact_email %}<p>{{ vacancy.contact_email }}</p>{% endif %}
+        {% if vacancy.contact_name %}<p class="prose">{{ vacancy.contact_name }}</p>{% endif %}
+        {% if vacancy.contact_phone %}<p class="prose">{{ vacancy.contact_phone }}</p>{% endif %}
+        {% if vacancy.contact_email %}<p class="prose">{{ vacancy.contact_email }}</p>{% endif %}
       </div>
       {% endif %}
 
-      <!-- Форма отклика -->
       {% if user.is_authenticated and user.role == 'applicant' %}
         <div class="vacancy-detail__section">
           {% if already_applied %}
@@ -63,7 +69,7 @@
               <button type="submit" class="btn-primary">Отправить отклик</button>
             </form>
           {% else %}
-            <div class="alert">Добавьте резюме чтобы откликнуться.</div>
+            <div class="alert">Добавьте резюме чтобы откликнуться на вакансию.</div>
           {% endif %}
         </div>
       {% elif not user.is_authenticated %}

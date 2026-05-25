@@ -5,42 +5,100 @@
   {% include "partials/nav.html" %}
   <main class="page-main">
     <div class="page-head">
-      <h1 class="page-title">Отклики: {{ vacancy.title }}</h1>
+      <h1 class="page-title">Отклики на вакансию</h1>
       <a href="{% url 'vacancies:my_list' %}" class="btn-back">← Мои вакансии</a>
     </div>
+    <p class="page-sub">{{ vacancy.title }} · {{ applications|length }} откликов</p>
+
     {% if messages %}{% for m in messages %}<div class="alert alert--{{ m.tags }}">{{ m }}</div>{% endfor %}{% endif %}
+
     {% if applications %}
-      <div class="item-list">
+      <div class="app-list">
         {% for app in applications %}
-        <div class="item-card">
-          <div class="item-card__body">
-            <p class="item-card__title">{{ app.resume.applicant.get_full_name }}</p>
-            <p class="item-card__company">{{ app.resume.title }} · Опыт: {{ app.resume.experience_years }} лет</p>
-            {% if app.cover_letter %}
-            <p class="item-card__comment">{{ app.cover_letter|truncatewords:30 }}</p>
-            {% endif %}
-            <div class="item-card__meta">
+        <div class="app-card">
+
+          <!-- Шапка: соискатель + статус -->
+          <div class="app-card__head">
+            <div class="app-card__who">
+              {% with a=app.resume.applicant %}
+                {% if a.avatar %}
+                  <img src="{{ a.avatar.url }}" alt="{{ a.get_full_name }}" class="app-avatar app-avatar--photo">
+                {% else %}
+                  <div class="app-avatar">{{ a.first_name|first|upper }}{{ a.last_name|first|upper }}</div>
+                {% endif %}
+                <div>
+                  <p class="app-card__name">{{ a.get_full_name }}</p>
+                  <p class="app-card__position">{{ app.resume.title }}</p>
+                </div>
+              {% endwith %}
+            </div>
+            <div class="app-card__meta-right">
               <span class="badge badge--{{ app.status }}">{{ app.get_status_display }}</span>
-              <span>{{ app.created_at|date:"d.m.Y" }}</span>
+              <span class="app-card__date">{{ app.created_at|date:"d.m.Y" }}</span>
             </div>
           </div>
-          <div class="item-card__actions">
+
+          <!-- Данные резюме -->
+          <div class="app-resume">
+            <div class="app-resume__tags">
+              <span class="tag"><i class="ph ph-clock"></i> Опыт: {{ app.resume.experience_years }} лет</span>
+              {% if app.resume.salary_expected %}
+                <span class="tag"><i class="ph ph-currency-rub"></i> {{ app.resume.salary_expected|floatformat:0 }} ₽</span>
+              {% endif %}
+              {% if app.resume.education %}
+                <span class="tag"><i class="ph ph-graduation-cap"></i> {{ app.resume.get_education_display }}</span>
+              {% endif %}
+              {% with appl=app.resume.applicant %}
+                {% if appl.city %}<span class="tag"><i class="ph ph-map-pin"></i> {{ appl.city }}</span>{% endif %}
+                {% if appl.phone %}<span class="tag"><i class="ph ph-phone"></i> {{ appl.phone }}</span>{% endif %}
+              {% endwith %}
+              {% if app.resume.resume_pdf %}
+                <a href="{{ app.resume.resume_pdf.url }}" target="_blank" class="tag tag--accent">
+                  <i class="ph ph-file-pdf"></i> Скачать PDF
+                </a>
+              {% endif %}
+            </div>
+
+            {% if app.resume.skills %}
+            <div class="app-resume__skills">
+              <span class="app-resume__skills-label">Навыки:</span>
+              {{ app.resume.skills }}
+            </div>
+            {% endif %}
+
+            {% if app.cover_letter %}
+            <div class="app-resume__cover">
+              <span class="app-resume__skills-label">Сопроводительное письмо:</span>
+              <p>{{ app.cover_letter }}</p>
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- Действия: смена статуса -->
+          <div class="app-card__actions">
             <form method="post" action="{% url 'vacancies:application_status' app.pk %}" class="status-form">
               {% csrf_token %}
-              <select name="status" class="filter-select filter-select--sm">
+              <select name="status" class="filter-select">
                 {% for val, label in app.STATUS_CHOICES %}
                 <option value="{{ val }}" {% if app.status == val %}selected{% endif %}>{{ label }}</option>
                 {% endfor %}
               </select>
-              <input type="text" name="employer_comment" placeholder="Комментарий (необязательно)" class="filter-input filter-input--sm" value="{{ app.employer_comment }}">
-              <button type="submit" class="btn-sm">Сохранить</button>
+              <input type="text" name="employer_comment"
+                     placeholder="Комментарий для соискателя..."
+                     class="filter-input"
+                     value="{{ app.employer_comment }}">
+              <button type="submit" class="btn-primary btn-primary--sm">Сохранить</button>
             </form>
           </div>
+
         </div>
         {% endfor %}
       </div>
     {% else %}
-      <div class="empty-state"><p>Откликов пока нет.</p></div>
+      <div class="empty-state">
+        <i class="ph ph-tray" style="font-size:3rem;color:var(--text-muted)"></i>
+        <p>Откликов пока нет.</p>
+      </div>
     {% endif %}
   </main>
 </div>

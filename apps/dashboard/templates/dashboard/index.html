@@ -1,0 +1,381 @@
+{% extends "base.html" %}
+{% block title %}Статистика — JobBureau Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+.adm { display:flex; min-height:100dvh; }
+.adm-side {
+  width:220px; flex-shrink:0;
+  background:var(--bg-brand);
+  border-right:1px solid var(--border);
+  display:flex; flex-direction:column;
+  padding:1.5rem 0;
+  position:sticky; top:0; height:100dvh;
+}
+.adm-side__logo { padding:0 1.5rem 1.5rem; border-bottom:1px solid var(--border); }
+.adm-nav { padding:1rem 0; flex:1; }
+.adm-nav a {
+  display:flex; align-items:center; gap:.65rem;
+  padding:.65rem 1.5rem;
+  font-size:.85rem; color:var(--text-muted);
+  text-decoration:none;
+  transition:color var(--transition), background var(--transition);
+}
+.adm-nav a:hover, .adm-nav a.active {
+  color:var(--text); background:rgba(108,99,255,.08);
+}
+.adm-nav a i { font-size:1rem; }
+.adm-nav__section {
+  font-size:.68rem; font-weight:500; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--text-muted);
+  padding:.75rem 1.5rem .25rem;
+}
+.adm-main { flex:1; overflow:auto; }
+.adm-content { padding:2rem; max-width:1300px; }
+
+/* Stat cards */
+.stat-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(200px,1fr));
+  gap:1rem; margin-bottom:2rem;
+}
+.stat-card {
+  background:var(--bg-card); border:1px solid var(--border);
+  border-radius:var(--radius-lg); padding:1.25rem 1.5rem;
+}
+.stat-card--accent { border-color:rgba(108,99,255,.3); background:rgba(108,99,255,.06); }
+.stat-card--green  { border-color:rgba(78,203,141,.3); background:rgba(78,203,141,.06); }
+.stat-card__label {
+  font-size:.72rem; font-weight:500; letter-spacing:.06em;
+  text-transform:uppercase; color:var(--text-muted); margin-bottom:.4rem;
+}
+.stat-card__value {
+  font-family:var(--font-display); font-size:2rem;
+  letter-spacing:-0.03em; color:var(--text); line-height:1;
+}
+.stat-card--accent .stat-card__value { color:var(--accent); }
+.stat-card--green  .stat-card__value { color:var(--success); }
+.stat-card__sub { font-size:.78rem; color:var(--text-muted); margin-top:.35rem; }
+
+/* Charts */
+.charts-grid {
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:1rem; margin-bottom:2rem;
+}
+.charts-grid--wide { grid-template-columns:2fr 1fr; }
+.chart-card {
+  background:var(--bg-card); border:1px solid var(--border);
+  border-radius:var(--radius-lg); padding:1.5rem;
+}
+.chart-card__title {
+  font-size:.8rem; font-weight:500; letter-spacing:.06em;
+  text-transform:uppercase; color:var(--text-muted);
+  margin-bottom:1.25rem;
+}
+.chart-wrap { position:relative; height:220px; }
+
+/* Tables */
+.adm-table-card {
+  background:var(--bg-card); border:1px solid var(--border);
+  border-radius:var(--radius-lg); overflow:hidden; margin-bottom:1rem;
+}
+.adm-table-head {
+  padding:1rem 1.5rem; border-bottom:1px solid var(--border);
+  font-size:.8rem; font-weight:500; letter-spacing:.06em;
+  text-transform:uppercase; color:var(--text-muted);
+  display:flex; align-items:center; justify-content:space-between;
+}
+.adm-table { width:100%; border-collapse:collapse; }
+.adm-table th {
+  font-size:.72rem; font-weight:500; letter-spacing:.05em;
+  text-transform:uppercase; color:var(--text-muted);
+  padding:.65rem 1.5rem; text-align:left;
+  border-bottom:1px solid var(--border);
+}
+.adm-table td {
+  padding:.75rem 1.5rem; font-size:.85rem;
+  color:var(--text-muted); border-bottom:1px solid rgba(42,42,46,.5);
+}
+.adm-table tr:last-child td { border-bottom:none; }
+.adm-table td:first-child { color:var(--text); }
+.adm-table tr:hover td { background:rgba(255,255,255,.02); }
+.adm-page-title {
+  font-family:var(--font-display); font-size:2rem;
+  letter-spacing:-0.03em; color:var(--text);
+  margin-bottom:.4rem;
+}
+.adm-page-sub { font-size:.85rem; color:var(--text-muted); margin-bottom:2rem; }
+
+@media(max-width:900px){
+  .adm-side { display:none; }
+  .charts-grid, .charts-grid--wide { grid-template-columns:1fr; }
+  .stat-grid { grid-template-columns:repeat(2,1fr); }
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="adm">
+
+  <!-- Sidebar -->
+  <aside class="adm-side">
+    <div class="adm-side__logo">
+      <a href="/" class="brand-logo">Job<span>Bureau</span></a>
+    </div>
+    <nav class="adm-nav">
+      <div class="adm-nav__section">Обзор</div>
+      <a href="{% url 'dashboard:index' %}" class="active">
+        <i class="ph ph-squares-four"></i> Дашборд
+      </a>
+      <div class="adm-nav__section">Пользователи</div>
+      <a href="/admin/accounts/user/"><i class="ph ph-users"></i> Пользователи</a>
+      <a href="/admin/applicants/applicant/"><i class="ph ph-user"></i> Соискатели</a>
+      <a href="/admin/employers/employer/"><i class="ph ph-buildings"></i> Работодатели</a>
+      <div class="adm-nav__section">Платформа</div>
+      <a href="/admin/vacancies/vacancy/"><i class="ph ph-briefcase"></i> Вакансии</a>
+      <a href="/admin/vacancies/application/"><i class="ph ph-paper-plane-tilt"></i> Отклики</a>
+      <a href="/admin/payments/payment/"><i class="ph ph-credit-card"></i> Платежи</a>
+      <div class="adm-nav__section">Система</div>
+      <a href="/admin/"><i class="ph ph-gear"></i> Django Admin</a>
+      <a href="{% url 'accounts:logout' %}"><i class="ph ph-sign-out"></i> Выйти</a>
+    </nav>
+  </aside>
+
+  <!-- Main -->
+  <main class="adm-main">
+    <div class="adm-content">
+      <p class="adm-page-title">Статистика</p>
+      <p class="adm-page-sub">Обзор платформы в реальном времени</p>
+
+      <!-- Сводные карточки -->
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-card__label"><i class="ph ph-users"></i> Всего пользователей</div>
+          <div class="stat-card__value">{{ stats.users_total }}</div>
+          <div class="stat-card__sub">+{{ stats.users_week }} за неделю</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__label"><i class="ph ph-user"></i> Соискателей</div>
+          <div class="stat-card__value">{{ stats.applicants_total }}</div>
+          <div class="stat-card__sub">{{ stats.resumes_total }} резюме</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__label"><i class="ph ph-buildings"></i> Работодателей</div>
+          <div class="stat-card__value">{{ stats.employers_total }}</div>
+          <div class="stat-card__sub">{{ stats.employers_verified }} верифицировано</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__label"><i class="ph ph-briefcase"></i> Вакансий активных</div>
+          <div class="stat-card__value">{{ stats.vacancies_active }}</div>
+          <div class="stat-card__sub">Всего: {{ stats.vacancies_total }}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__label"><i class="ph ph-paper-plane-tilt"></i> Откликов</div>
+          <div class="stat-card__value">{{ stats.apps_total }}</div>
+          <div class="stat-card__sub">{{ stats.apps_accepted }} принято · {{ stats.apps_pending }} ожидают</div>
+        </div>
+        <div class="stat-card stat-card--green">
+          <div class="stat-card__label"><i class="ph ph-currency-rub"></i> Доход за 30 дней</div>
+          <div class="stat-card__value">{{ stats.revenue_month|floatformat:0 }} ₽</div>
+          <div class="stat-card__sub">Всего: {{ stats.revenue_total|floatformat:0 }} ₽</div>
+        </div>
+        <div class="stat-card stat-card--accent">
+          <div class="stat-card__label"><i class="ph ph-receipt"></i> Платежей</div>
+          <div class="stat-card__value">{{ stats.payments_count }}</div>
+          <div class="stat-card__sub">Успешных транзакций</div>
+        </div>
+      </div>
+
+      <!-- Графики ряд 1 -->
+      <div class="charts-grid charts-grid--wide">
+        <div class="chart-card">
+          <div class="chart-card__title"><i class="ph ph-trend-up"></i> Регистрации за 30 дней</div>
+          <div class="chart-wrap"><canvas id="regChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card__title"><i class="ph ph-chart-pie"></i> Отклики по статусам</div>
+          <div class="chart-wrap"><canvas id="statusChart"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Графики ряд 2 -->
+      <div class="charts-grid" style="grid-template-columns:1fr;margin-bottom:2rem;">
+        <div class="chart-card">
+          <div class="chart-card__title"><i class="ph ph-chart-bar"></i> Доходы по месяцам (₽)</div>
+          <div class="chart-wrap" style="height:180px;"><canvas id="revChart"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Таблицы -->
+      <div class="charts-grid">
+
+        <!-- Топ работодателей -->
+        <div class="adm-table-card">
+          <div class="adm-table-head">
+            <span><i class="ph ph-trophy"></i> Топ работодателей</span>
+          </div>
+          <table class="adm-table">
+            <thead>
+              <tr>
+                <th>Компания</th>
+                <th>Вакансий</th>
+                <th>Принято</th>
+                <th>Доход</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for e in top_employers %}
+              <tr>
+                <td>{{ e.company_name }}</td>
+                <td>{{ e.vac_count }}</td>
+                <td>{{ e.accepted_count }}</td>
+                <td>{% if e.revenue %}{{ e.revenue|floatformat:0 }} ₽{% else %}—{% endif %}</td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="4" style="text-align:center;color:var(--text-muted)">Нет данных</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Последние платежи -->
+        <div class="adm-table-card">
+          <div class="adm-table-head">
+            <span><i class="ph ph-credit-card"></i> Последние платежи</span>
+          </div>
+          <table class="adm-table">
+            <thead>
+              <tr>
+                <th>Компания</th>
+                <th>Сумма</th>
+                <th>Дата</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for p in recent_payments %}
+              <tr>
+                <td>{{ p.employer.company_name }}</td>
+                <td>{{ p.amount|floatformat:0 }} ₽</td>
+                <td>{{ p.created_at|date:"d.m.Y" }}</td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="3" style="text-align:center;color:var(--text-muted)">Нет платежей</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+      <!-- Последние регистрации -->
+      <div class="adm-table-card">
+        <div class="adm-table-head">
+          <span><i class="ph ph-users"></i> Последние регистрации</span>
+        </div>
+        <table class="adm-table">
+          <thead>
+            <tr><th>Email</th><th>Роль</th><th>Подтверждён</th><th>Дата</th></tr>
+          </thead>
+          <tbody>
+            {% for u in recent_users %}
+            <tr>
+              <td>{{ u.email }}</td>
+              <td>{{ u.get_role_display }}</td>
+              <td>{% if u.is_verified %}<span class="badge badge--active">Да</span>{% else %}<span class="badge badge--hidden">Нет</span>{% endif %}</td>
+              <td>{{ u.created_at|date:"d.m.Y H:i" }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+const ACCENT  = 'rgba(108,99,255,1)';
+const ACCENT2 = 'rgba(108,99,255,.15)';
+const GREEN   = 'rgba(78,203,141,1)';
+const GREEN2  = 'rgba(78,203,141,.15)';
+const ORANGE  = 'rgba(255,165,0,1)';
+const RED     = 'rgba(255,107,107,1)';
+const MUTED   = '#6b6b75';
+const GRID    = 'rgba(42,42,46,.6)';
+
+Chart.defaults.color = MUTED;
+Chart.defaults.borderColor = GRID;
+Chart.defaults.font.family = "'DM Sans', sans-serif";
+Chart.defaults.font.size   = 11;
+
+// Регистрации
+new Chart(document.getElementById('regChart'), {
+  type: 'line',
+  data: {
+    labels: {{ reg_days_json|safe }},
+    datasets: [
+      {
+        label: 'Соискатели',
+        data:  {{ reg_appl_json|safe }},
+        borderColor: ACCENT, backgroundColor: ACCENT2,
+        tension: .4, fill: true, pointRadius: 3,
+      },
+      {
+        label: 'Работодатели',
+        data:  {{ reg_empl_json|safe }},
+        borderColor: GREEN, backgroundColor: GREEN2,
+        tension: .4, fill: true, pointRadius: 3,
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'top' } },
+    scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+  }
+});
+
+// Отклики по статусам
+new Chart(document.getElementById('statusChart'), {
+  type: 'doughnut',
+  data: {
+    labels: {{ status_labels_json|safe }},
+    datasets: [{
+      data: {{ status_data_json|safe }},
+      backgroundColor: [ACCENT, ORANGE, GREEN, RED],
+      borderColor: '#161618',
+      borderWidth: 3,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom' } },
+    cutout: '65%',
+  }
+});
+
+// Доходы по месяцам
+new Chart(document.getElementById('revChart'), {
+  type: 'bar',
+  data: {
+    labels: {{ rev_labels_json|safe }},
+    datasets: [{
+      label: 'Доход (₽)',
+      data: {{ rev_data_json|safe }},
+      backgroundColor: ACCENT2,
+      borderColor: ACCENT,
+      borderWidth: 1,
+      borderRadius: 6,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: { y: { beginAtZero: true } }
+  }
+});
+</script>
+{% endblock %}

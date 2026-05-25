@@ -2,6 +2,11 @@ from django import forms
 from .models import Employer
 
 
+class NoClearFileInput(forms.FileInput):
+    """FileInput без кнопки 'Очистить'."""
+    pass
+
+
 class EmployerProfileForm(forms.ModelForm):
     class Meta:
         model  = Employer
@@ -12,4 +17,5 @@ class EmployerProfileForm(forms.ModelForm):
         ]
         widgets = {
             'about': forms.Textarea(attrs={'rows': 4}),
+            'logo':  NoClearFileInput(),
         }

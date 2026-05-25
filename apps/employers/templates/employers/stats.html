@@ -1,0 +1,300 @@
+{% extends "base.html" %}
+{% block title %}Аналитика — JobBureau{% endblock %}
+
+{% block extra_css %}
+<style>
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.stats-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+}
+.stats-card--accent { border-color: rgba(108,99,255,.3); background: rgba(108,99,255,.05); }
+.stats-card--green  { border-color: rgba(78,203,141,.3); background: rgba(78,203,141,.05); }
+.stats-card--warn   { border-color: rgba(255,165,0,.3);  background: rgba(255,165,0,.05); }
+.stats-card__label {
+  font-size: .72rem; font-weight: 500; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--text-muted); margin-bottom: .4rem;
+}
+.stats-card__value {
+  font-family: var(--font-display); font-size: 2rem;
+  letter-spacing: -0.03em; line-height: 1; color: var(--text);
+}
+.stats-card--accent .stats-card__value { color: var(--accent); }
+.stats-card--green  .stats-card__value { color: var(--success); }
+.stats-card--warn   .stats-card__value { color: #ffa500; }
+.stats-card__sub { font-size: .78rem; color: var(--text-muted); margin-top: .35rem; }
+
+.charts-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.chart-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+}
+.chart-card__title {
+  font-size: .78rem; font-weight: 500; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--text-muted); margin-bottom: 1.25rem;
+}
+.chart-wrap { position: relative; height: 200px; }
+
+.vac-table-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+.vac-table-head {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  font-size: .78rem; font-weight: 500;
+  letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted);
+}
+.vac-table { width: 100%; border-collapse: collapse; }
+.vac-table th {
+  font-size: .72rem; font-weight: 500; letter-spacing: .05em;
+  text-transform: uppercase; color: var(--text-muted);
+  padding: .65rem 1.5rem; text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+.vac-table td {
+  padding: .8rem 1.5rem; font-size: .85rem;
+  color: var(--text-muted); border-bottom: 1px solid rgba(42,42,46,.5);
+}
+.vac-table tr:last-child td { border-bottom: none; }
+.vac-table td:first-child { color: var(--text); font-weight: 400; }
+.vac-table tr:hover td { background: rgba(255,255,255,.02); }
+
+.progress-bar {
+  height: 4px; background: var(--bg-input);
+  border-radius: 2px; overflow: hidden; margin-top: .3rem;
+}
+.progress-bar__fill {
+  height: 100%; border-radius: 2px;
+  background: var(--accent); transition: width .4s ease;
+}
+
+@media (max-width: 700px) {
+  .charts-row { grid-template-columns: 1fr; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .vac-table th:nth-child(3),
+  .vac-table td:nth-child(3),
+  .vac-table th:nth-child(4),
+  .vac-table td:nth-child(4) { display: none; }
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="shell">
+  {% include "partials/nav.html" %}
+  <main class="page-main">
+    <div class="page-head">
+      <h1 class="page-title">Аналитика</h1>
+      <a href="{% url 'accounts:dashboard' %}" class="btn-back">← Кабинет</a>
+    </div>
+    <p class="page-sub">{{ employer.company_name }}</p>
+
+    <!-- Сводные карточки -->
+    <div class="stats-grid">
+      <div class="stats-card">
+        <div class="stats-card__label"><i class="ph ph-paper-plane-tilt"></i> Всего откликов</div>
+        <div class="stats-card__value">{{ total_apps }}</div>
+        <div class="stats-card__sub">По всем вакансиям</div>
+      </div>
+      <div class="stats-card stats-card--accent">
+        <div class="stats-card__label"><i class="ph ph-check-circle"></i> Принято</div>
+        <div class="stats-card__value">{{ total_accepted }}</div>
+        <div class="stats-card__sub">
+          {% if total_apps %}
+            {{ total_accepted|floatformat:0 }} из {{ total_apps }}
+          {% else %}
+            Откликов нет
+          {% endif %}
+        </div>
+      </div>
+      <div class="stats-card stats-card--green">
+        <div class="stats-card__label"><i class="ph ph-credit-card"></i> Оплачено бюро</div>
+        <div class="stats-card__value">{{ total_paid|floatformat:0 }} ₽</div>
+        <div class="stats-card__sub">Всего транзакций</div>
+      </div>
+      {% if unpaid_count %}
+      <div class="stats-card stats-card--warn">
+        <div class="stats-card__label"><i class="ph ph-clock"></i> Ожидает оплаты</div>
+        <div class="stats-card__value">{{ unpaid_count }}</div>
+        <div class="stats-card__sub">
+          {{ unpaid_sum|floatformat:0 }} ₽
+          <a href="{% url 'payments:unpaid_list' %}" style="color:var(--accent);margin-left:.4rem;">Оплатить</a>
+        </div>
+      </div>
+      {% endif %}
+      <div class="stats-card">
+        <div class="stats-card__label"><i class="ph ph-briefcase"></i> Вакансий</div>
+        <div class="stats-card__value">{{ vacancies|length }}</div>
+        <div class="stats-card__sub">Всего размещено</div>
+      </div>
+    </div>
+
+    <!-- Графики -->
+    {% if edu_labels_json != "[]" or city_labels_json != "[]" %}
+    <div class="charts-row">
+      {% if city_labels_json != "[]" %}
+      <div class="chart-card">
+        <div class="chart-card__title"><i class="ph ph-map-pin"></i> Города соискателей</div>
+        <div class="chart-wrap"><canvas id="cityChart"></canvas></div>
+      </div>
+      {% endif %}
+      {% if edu_labels_json != "[]" %}
+      <div class="chart-card">
+        <div class="chart-card__title"><i class="ph ph-graduation-cap"></i> Образование соискателей</div>
+        <div class="chart-wrap"><canvas id="eduChart"></canvas></div>
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Таблица вакансий -->
+    <div class="vac-table-card">
+      <div class="vac-table-head"><i class="ph ph-briefcase"></i> Статистика по вакансиям</div>
+      <table class="vac-table">
+        <thead>
+          <tr>
+            <th>Вакансия</th>
+            <th>Откликов</th>
+            <th>Принято</th>
+            <th>Ожидает</th>
+            <th>Статус</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for v in vacancies %}
+          <tr>
+            <td>
+              <a href="{% url 'vacancies:applications' v.pk %}" style="color:var(--text);text-decoration:none;">
+                {{ v.title }}
+              </a>
+              {% if v.total_apps %}
+              <div class="progress-bar">
+                <div class="progress-bar__fill" style="width:{% widthratio v.accepted v.total_apps 100 %}%"></div>
+              </div>
+              {% endif %}
+            </td>
+            <td>{{ v.total_apps }}</td>
+            <td><span style="color:var(--success)">{{ v.accepted }}</span></td>
+            <td><span style="color:var(--accent)">{{ v.pending }}</span></td>
+            <td><span class="badge badge--{{ v.status }}">{{ v.get_status_display }}</span></td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:2rem">Вакансий нет</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Последние отклики -->
+    {% if recent_apps %}
+    <div class="vac-table-card">
+      <div class="vac-table-head"><i class="ph ph-users"></i> Последние отклики</div>
+      <table class="vac-table">
+        <thead>
+          <tr>
+            <th>Соискатель</th>
+            <th>Вакансия</th>
+            <th>Город</th>
+            <th>Опыт</th>
+            <th>Статус</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for app in recent_apps %}
+          <tr>
+            <td>{{ app.resume.applicant.get_full_name }}</td>
+            <td style="color:var(--text-muted)">{{ app.vacancy.title }}</td>
+            <td>{{ app.resume.applicant.city|default:"—" }}</td>
+            <td>{{ app.resume.experience_years }} лет</td>
+            <td><span class="badge badge--{{ app.status }}">{{ app.get_status_display }}</span></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+
+  </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+const ACCENT  = 'rgba(108,99,255,1)';
+const ACCENT2 = 'rgba(108,99,255,.15)';
+const GREEN   = 'rgba(78,203,141,1)';
+const ORANGE  = 'rgba(255,165,0,1)';
+const RED     = 'rgba(255,107,107,1)';
+const BLUE    = 'rgba(100,180,255,1)';
+const MUTED   = '#6b6b75';
+const GRID    = 'rgba(42,42,46,.6)';
+
+Chart.defaults.color = MUTED;
+Chart.defaults.borderColor = GRID;
+Chart.defaults.font.family = "'DM Sans', sans-serif";
+Chart.defaults.font.size   = 11;
+
+const PALETTE = [ACCENT, GREEN, ORANGE, RED, BLUE,
+  'rgba(180,100,255,1)', 'rgba(255,200,100,1)', 'rgba(100,220,180,1)'];
+
+{% if city_labels_json != "[]" %}
+new Chart(document.getElementById('cityChart'), {
+  type: 'bar',
+  data: {
+    labels: {{ city_labels_json|safe }},
+    datasets: [{
+      data: {{ city_data_json|safe }},
+      backgroundColor: ACCENT2,
+      borderColor: ACCENT,
+      borderWidth: 1,
+      borderRadius: 6,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+  }
+});
+{% endif %}
+
+{% if edu_labels_json != "[]" %}
+new Chart(document.getElementById('eduChart'), {
+  type: 'doughnut',
+  data: {
+    labels: {{ edu_labels_json|safe }},
+    datasets: [{
+      data: {{ edu_data_json|safe }},
+      backgroundColor: PALETTE,
+      borderColor: '#161618',
+      borderWidth: 3,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom' } },
+    cutout: '60%',
+  }
+});
+{% endif %}
+</script>
+{% endblock %}

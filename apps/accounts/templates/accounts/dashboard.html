@@ -4,43 +4,59 @@
 {% block body %}
 <div class="shell">
   {% include "partials/nav.html" %}
-  <main class="dash-main">
+  <main class="page-main">
     <h1 class="page-title">Личный кабинет</h1>
     <p class="page-sub">{{ user.email }} · {{ user.get_role_display }}</p>
 
     <div class="dash-cards">
       {% if user.role == 'applicant' %}
         <a href="{% url 'applicants:profile' %}" class="dash-card">
-          <span class="dash-card__icon">👤</span>
+          <span class="dash-card__icon"><i class="ph ph-user"></i></span>
           <span class="dash-card__label">Мой профиль</span>
         </a>
         <a href="{% url 'applicants:resume_list' %}" class="dash-card">
-          <span class="dash-card__icon">📄</span>
+          <span class="dash-card__icon"><i class="ph ph-file-text"></i></span>
           <span class="dash-card__label">Мои резюме</span>
         </a>
         <a href="{% url 'applicants:applications' %}" class="dash-card">
-          <span class="dash-card__icon">📬</span>
+          <span class="dash-card__icon"><i class="ph ph-paper-plane-tilt"></i></span>
           <span class="dash-card__label">Мои отклики</span>
         </a>
         <a href="{% url 'vacancies:list' %}" class="dash-card">
-          <span class="dash-card__icon">🔍</span>
+          <span class="dash-card__icon"><i class="ph ph-magnifying-glass"></i></span>
           <span class="dash-card__label">Найти работу</span>
         </a>
       {% else %}
         <a href="{% url 'employers:profile' %}" class="dash-card">
-          <span class="dash-card__icon">🏢</span>
+          <span class="dash-card__icon"><i class="ph ph-buildings"></i></span>
           <span class="dash-card__label">Профиль компании</span>
         </a>
         <a href="{% url 'vacancies:my_list' %}" class="dash-card">
-          <span class="dash-card__icon">📋</span>
+          <span class="dash-card__icon"><i class="ph ph-briefcase"></i></span>
           <span class="dash-card__label">Мои вакансии</span>
         </a>
         <a href="{% url 'vacancies:create' %}" class="dash-card">
-          <span class="dash-card__icon">➕</span>
+          <span class="dash-card__icon"><i class="ph ph-plus-circle"></i></span>
           <span class="dash-card__label">Новая вакансия</span>
+        </a>
+        <a href="{% url 'payments:unpaid_list' %}" class="dash-card dash-card--pay">
+          <span class="dash-card__icon"><i class="ph ph-credit-card"></i></span>
+          <span class="dash-card__label">Оплата откликов</span>
+        </a>
+        <a href="{% url 'employers:stats' %}" class="dash-card">
+          <span class="dash-card__icon"><i class="ph ph-chart-bar"></i></span>
+          <span class="dash-card__label">Аналитика</span>
         </a>
       {% endif %}
     </div>
+
+    {% if user.is_staff %}
+    <div style="margin-top:2rem;">
+      <a href="{% url 'dashboard:index' %}" class="btn-primary" style="display:inline-flex;align-items:center;gap:.5rem;">
+        <i class="ph ph-chart-line"></i> Открыть статистику
+      </a>
+    </div>
+    {% endif %}
   </main>
 </div>
 {% endblock %}

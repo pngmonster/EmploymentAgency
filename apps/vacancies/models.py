@@ -1,6 +1,4 @@
 from django.db import models
-from apps.employers.models import Employer
-from apps.applicants.models import Resume
 
 
 class Vacancy(models.Model):
@@ -29,7 +27,8 @@ class Vacancy(models.Model):
     ]
 
     employer         = models.ForeignKey(
-                           Employer, on_delete=models.CASCADE,
+                           'employers.Employer',
+                           on_delete=models.CASCADE,
                            related_name='vacancies'
                        )
     title            = models.CharField('Название вакансии', max_length=255)
@@ -37,28 +36,16 @@ class Vacancy(models.Model):
     experience_years = models.PositiveSmallIntegerField('Требуемый опыт (лет)', default=0)
     salary_min       = models.DecimalField('ЗП от', max_digits=12, decimal_places=2, null=True, blank=True)
     salary_max       = models.DecimalField('ЗП до', max_digits=12, decimal_places=2, null=True, blank=True)
-    employment_type  = models.CharField(
-                           'Тип занятости', max_length=15,
-                           choices=EMPLOYMENT_TYPE_CHOICES, default='full_time'
-                       )
-    schedule         = models.CharField(
-                           'График', max_length=15,
-                           choices=SCHEDULE_CHOICES, default='five_days'
-                       )
-    work_format      = models.CharField(
-                           'Формат работы', max_length=10,
-                           choices=WORK_FORMAT_CHOICES, default='office'
-                       )
+    employment_type  = models.CharField('Тип занятости', max_length=15, choices=EMPLOYMENT_TYPE_CHOICES, default='full_time')
+    schedule         = models.CharField('График', max_length=15, choices=SCHEDULE_CHOICES, default='five_days')
+    work_format      = models.CharField('Формат работы', max_length=10, choices=WORK_FORMAT_CHOICES, default='office')
     country          = models.CharField('Страна', max_length=100, blank=True)
     city             = models.CharField('Город', max_length=100, blank=True)
     address          = models.CharField('Адрес', max_length=255, blank=True)
     contact_name     = models.CharField('Контактное лицо', max_length=255, blank=True)
     contact_phone    = models.CharField('Телефон', max_length=30, blank=True)
     contact_email    = models.EmailField('Email', blank=True)
-    status           = models.CharField(
-                           'Статус', max_length=10,
-                           choices=STATUS_CHOICES, default='active'
-                       )
+    status           = models.CharField('Статус', max_length=10, choices=STATUS_CHOICES, default='active')
     expires_at       = models.DateField('Актуальна до', null=True, blank=True)
     created_at       = models.DateTimeField(auto_now_add=True)
     updated_at       = models.DateTimeField(auto_now=True)
@@ -94,19 +81,20 @@ class Application(models.Model):
     ]
 
     vacancy          = models.ForeignKey(
-                           Vacancy, on_delete=models.CASCADE,
+                           'vacancies.Vacancy',
+                           on_delete=models.CASCADE,
                            related_name='applications'
                        )
     resume           = models.ForeignKey(
-                           Resume, on_delete=models.CASCADE,
+                           'applicants.Resume',
+                           on_delete=models.CASCADE,
                            related_name='applications'
                        )
     cover_letter     = models.TextField('Сопроводительное письмо', blank=True)
-    status           = models.CharField(
-                           'Статус', max_length=10,
-                           choices=STATUS_CHOICES, default='pending'
-                       )
+    status           = models.CharField('Статус', max_length=10, choices=STATUS_CHOICES, default='pending')
     employer_comment = models.TextField('Комментарий работодателя', blank=True)
+    fee              = models.DecimalField('Сумма к оплате', max_digits=10, decimal_places=2, null=True, blank=True)
+    is_paid          = models.BooleanField('Оплачено', default=False)
     created_at       = models.DateTimeField(auto_now_add=True)
     updated_at       = models.DateTimeField(auto_now=True)
 
@@ -116,10 +104,7 @@ class Application(models.Model):
         verbose_name_plural = 'Отклики'
         ordering            = ['-created_at']
         constraints         = [
-            models.UniqueConstraint(
-                fields=['vacancy', 'resume'],
-                name='uq_application'
-            )
+            models.UniqueConstraint(fields=['vacancy', 'resume'], name='uq_application')
         ]
 
     def __str__(self):

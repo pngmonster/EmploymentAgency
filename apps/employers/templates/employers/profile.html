@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load form_tags %}
 {% block title %}Профиль компании — JobBureau{% endblock %}
 {% block body %}
 <div class="shell">
@@ -9,15 +10,37 @@
       <a href="{% url 'accounts:dashboard' %}" class="btn-back">← Кабинет</a>
     </div>
     {% if messages %}{% for m in messages %}<div class="alert alert--{{ m.tags }}">{{ m }}</div>{% endfor %}{% endif %}
+
     <div class="card">
       <form method="post" enctype="multipart/form-data" class="form-grid">
         {% csrf_token %}
         {% for field in form %}
-        <div class="field {% if field.errors %}field--error{% endif %} {% if field.name == 'about' or field.name == 'address' %}field--full{% endif %}">
-          <label class="field__label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-          {{ field }}
-          {% if field.errors %}<span class="field__error">{{ field.errors|first }}</span>{% endif %}
-        </div>
+          {% if field.name == 'logo' %}
+            <div class="field--full">
+              <label class="field__label">{{ field.label }}</label>
+              {% if employer.logo %}
+                <img src="{{ employer.logo.url }}" alt="Логотип" class="file-preview file-preview--square visible" id="preview-logo">
+              {% else %}
+                <img src="" alt="" class="file-preview file-preview--square" id="preview-logo">
+              {% endif %}
+              <label class="file-upload">
+                {{ field }}
+                <div class="file-upload__icon">🏢</div>
+                <div class="file-upload__text">
+                  <span class="file-upload__label">{% if employer.logo %}Заменить логотип{% else %}Загрузить логотип{% endif %}</span>
+                  <span class="file-upload__name" id="name-logo"></span>
+                </div>
+                <span class="file-upload__btn">Выбрать</span>
+              </label>
+              {% if field.errors %}<span class="field__error">{{ field.errors|first }}</span>{% endif %}
+            </div>
+          {% else %}
+            <div class="field {% if field.errors %}field--error{% endif %} {% if field.name == 'about' or field.name == 'address' %}field--full{% endif %}">
+              <label class="field__label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+              {% if field.errors %}<span class="field__error">{{ field.errors|first }}</span>{% endif %}
+            </div>
+          {% endif %}
         {% endfor %}
         <div class="field--full form-actions">
           <button type="submit" class="btn-primary">Сохранить</button>
@@ -26,4 +49,5 @@
     </div>
   </main>
 </div>
+
 {% endblock %}

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Оплата откликов — JobBureau{% endblock %}
+{% block body %}
+<div class="shell">
+  {% include "partials/nav.html" %}
+  <main class="page-main">
+    <div class="page-head">
+      <h1 class="page-title">Оплата откликов</h1>
+      <a href="{% url 'accounts:dashboard' %}" class="btn-back">← Кабинет</a>
+    </div>
+    {% if messages %}{% for m in messages %}<div class="alert alert--{{ m.level_tag }}">{{ m }}</div>{% endfor %}{% endif %}
+
+    {% if unpaid %}
+      <div class="pay-summary">
+        <div class="pay-summary__info">
+          <p class="pay-summary__count"><strong>{{ unpaid|length }}</strong> принятых откликов ожидают оплаты</p>
+          <p class="pay-summary__total">Итого: <span>{{ total }} ₽</span></p>
+        </div>
+        <form method="post" action="{% url 'payments:pay_all' %}">
+          {% csrf_token %}
+          <button type="submit" class="btn-primary">
+            <i class="ph ph-credit-card"></i> Оплатить всё — {{ total }} ₽
+          </button>
+        </form>
+      </div>
+
+      <div class="item-list">
+        {% for app in unpaid %}
+        <div class="item-card">
+          <div class="item-card__body">
+            <p class="item-card__title">{{ app.resume.applicant.get_full_name }}</p>
+            <p class="item-card__company">{{ app.vacancy.title }}</p>
+            <div class="item-card__meta">
+              <span>{{ app.resume.title }}</span>
+              {% if app.vacancy.city %}<span>{{ app.vacancy.city }}</span>{% endif %}
+              <span class="badge badge--accepted">Принят</span>
+            </div>
+          </div>
+          <div class="pay-card__fee">
+            {% if app.fee %}
+              <span class="fee-amount">{{ app.fee }} ₽</span>
+            {% else %}
+              <span style="color:var(--text-muted);font-size:.8rem">ЗП не указана</span>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <i class="ph ph-check-circle" style="font-size:3rem;color:var(--success)"></i>
+        <p>Нет откликов, ожидающих оплаты.</p>
+        <a href="{% url 'vacancies:my_list' %}" class="btn-primary">Мои вакансии</a>
+      </div>
+    {% endif %}
+  </main>
+</div>
+{% endblock %}

@@ -1,13 +1,17 @@
 <nav class="topnav">
   <a href="{% url 'vacancies:list' %}" class="brand-logo">Job<span>Bureau</span></a>
   <div class="topnav__links">
-    <a href="{% url 'vacancies:list' %}">Вакансии</a>
+    <a href="{% url 'vacancies:list' %}"><i class="ph ph-briefcase"></i> <span>Вакансии</span></a>
     {% if user.is_authenticated %}
-      <a href="{% url 'accounts:dashboard' %}">Кабинет</a>
-      <a href="{% url 'accounts:logout' %}" class="topnav__logout">Выйти</a>
+      <a href="{% url 'accounts:dashboard' %}"><i class="ph ph-squares-four"></i> <span>Кабинет</span></a>
+      <a href="{% url 'accounts:logout' %}" class="topnav__logout"><i class="ph ph-sign-out"></i> <span>Выйти</span></a>
     {% else %}
       <a href="{% url 'accounts:login' %}">Войти</a>
       <a href="{% url 'accounts:register' %}" class="btn-nav">Регистрация</a>
     {% endif %}
+    <button class="theme-toggle" onclick="toggleTheme()" title="Сменить тему" aria-label="Сменить тему">
+      <i class="ph ph-sun icon-sun"></i>
+      <i class="ph ph-moon icon-moon"></i>
+    </button>
   </div>
 </nav>

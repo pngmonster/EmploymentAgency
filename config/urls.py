@@ -6,11 +6,13 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('', RedirectView.as_view(url='/vacancies/')),
-    path('admin/', admin.site.urls),
+    path('admin/',      admin.site.urls),
     path('accounts/',   include('apps.accounts.urls')),
     path('applicants/', include('apps.applicants.urls')),
     path('employers/',  include('apps.employers.urls')),
     path('vacancies/',  include('apps.vacancies.urls')),
+    path('payments/',   include('apps.payments.urls')),
+    path('dashboard/',  include('apps.dashboard.urls')),
 ]
 
 if settings.DEBUG:

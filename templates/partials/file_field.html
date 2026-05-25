@@ -1,0 +1,63 @@
+<div class="file-field">
+  <label class="field__label">{{ field.label }}</label>
+
+  {% if preview_type == 'avatar' or preview_type == 'logo' %}
+    {% if current_url %}
+      <img src="{{ current_url }}"
+           class="file-preview {% if preview_type == 'logo' %}file-preview--square{% endif %} visible"
+           id="preview-{{ field.html_name }}" alt="Текущее фото">
+    {% else %}
+      <img src="" class="file-preview {% if preview_type == 'logo' %}file-preview--square{% endif %}"
+           id="preview-{{ field.html_name }}" alt="">
+    {% endif %}
+  {% endif %}
+
+  <label class="file-upload" for="{{ field.id_for_label }}" onclick="event.preventDefault()">
+    {{ field }}
+    <div class="file-upload__icon">{{ icon }}</div>
+    <div class="file-upload__text">
+      {% if current_url %}
+        <span class="file-upload__label">Заменить файл</span>
+      {% else %}
+        <span class="file-upload__label">Нажмите чтобы выбрать файл</span>
+      {% endif %}
+      <span class="file-upload__name" id="name-{{ field.html_name }}"></span>
+    </div>
+    <span class="file-upload__btn">Выбрать</span>
+  </label>
+
+  {% if field.errors %}
+    <span class="field__error">{{ field.errors|first }}</span>
+  {% endif %}
+</div>
+
+<script>
+(function() {
+  var input   = document.getElementById('{{ field.id_for_label }}');
+  var nameEl  = document.getElementById('name-{{ field.html_name }}');
+  var preview = document.getElementById('preview-{{ field.html_name }}');
+  var labelEl = input.closest('.file-upload').querySelector('.file-upload__label');
+
+  input.closest('.file-upload').addEventListener('click', function() {
+    input.click();
+  });
+
+  input.addEventListener('change', function() {
+    var file = this.files[0];
+    if (!file) return;
+    if (nameEl) {
+      nameEl.textContent = file.name;
+      nameEl.classList.add('visible');
+      if (labelEl) labelEl.style.display = 'none';
+    }
+    if (preview && file.type.startsWith('image/')) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        preview.src = e.target.result;
+        preview.classList.add('visible');
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+})();
+</script>
